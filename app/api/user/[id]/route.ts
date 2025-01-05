@@ -31,6 +31,7 @@ export const PUT = async (req, {params}) => {
     }
 }
 
+// Get the user data
 export const GET = async (req, {params}) => {
     try {
         await connectToDB();

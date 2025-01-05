@@ -25,7 +25,7 @@ const handler = NextAuth({
           if (!isValid) {
             throw new Error('Invalid email or password');
           }
-          return { email: user.email, username: user.username, image: user.image };
+          return { email: user.email, id : user.id, name : user.name };
         }
         catch (error) {
           console.log("Error authorizing credentials: ", error.message);
@@ -37,13 +37,26 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   url: process.env.NEXTAUTH_URL,
   callbacks: {
-    async session({ session }) {
-      // store the user id, name from MongoDB to session
-      const sessionUser = await User.findOne({ email: session.user.email });
-      session.user.id = sessionUser._id.toString();
-      session.user.name = sessionUser.name;
+    async jwt({token, user}){
+      if(user){
+        console.log(user);
+        token.name = user.name;
+        token.email = user.email;
+        token.id = user.id.toString();
+      }
+      return token;
+    },
+    async session({session, token}) {
+
+        if (token && session.user) {
+          session.user.name = token.name;
+          session.user.email = token.email;
+          session.user.id = token.id;
+        }
+
       return session;
     },
+
     async signIn({ account, profile, user, credentials }) {
       try {
         await connectToDB();
