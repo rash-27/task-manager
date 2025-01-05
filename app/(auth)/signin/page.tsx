@@ -20,6 +20,7 @@ export default function Signin() {
   
   async function handleOnClick(){
       await signIn('credentials',{email : email, password: password});
+      alert("Successfully Logged in!!")
       router.push('/')
   }
 

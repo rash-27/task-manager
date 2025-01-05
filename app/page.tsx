@@ -13,6 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Image from "next/image";
 
 export default function Home() {
 
@@ -139,7 +140,9 @@ export default function Home() {
             <div onClick={()=>setAddOpen(true)} className="px-2 py-1.5 ml-2 text-md border-2 transition-all duration-300 ease-in-out hover:scale-110 hover:border-green-400 hover:shadow-lg border-green-500 cursor-pointer rounded-md text-green-800">Add task</div>
           </div>
           {pendingTasks.length == 0 ?  
-            <div className="text-center font-semibold text-xl">No pending tasks</div> : 
+            <div className="flex justify-center font-semibold text-xl">
+              <Image src={'/no-results.png'} width={150} height={150} alt="No Pending tasks" />
+            </div> : 
             pendingTasks.map((pt, ind)=>{
               return (<div key={ind} className={` mx-12 mb-8 border-2 py-6 rounded-lg border-red-600 flex justify-between px-4 transition-all duration-300 ease-in-out hover:border-red-400 hover:shadow-lg `}>
               <div className="text-xl font-semibold">{pt.description}</div>
@@ -168,7 +171,9 @@ export default function Home() {
           </div>
         {!hideCompletedTasks && <div>
           {(completedTasks.length == 0) ?  
-            <div className="text-center font-semibold text-xl">No completed tasks</div> : 
+            <div className="flex justify-center font-semibold text-xl">
+              <Image src={'/no-results.png'} width={150} height={150} alt="No Completed tasks" />
+            </div>  : 
             completedTasks.map((pt, ind)=>{
               return (<div key={ind} className={` mx-12 mb-8 border-2 py-6 rounded-lg border-green-600 flex justify-between px-4 transition-all duration-300 ease-in-out hover:border-green-400 hover:shadow-lg `}>
               <div className="text-xl font-semibold">{pt.description}</div>
