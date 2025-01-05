@@ -5,7 +5,7 @@ import { Suspense, useEffect, useState } from "react";
 import Loading from "@/app/loading";
 import { findCompletedTasks, findPendingTasks, taskInterface } from "@/utils/utils";
 import axios from "axios";
-import { formatDate, taskInterface } from "@/utils/utils";
+import { formatDate } from "@/utils/utils";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Modal, TextField } from "@mui/material";
@@ -24,9 +24,10 @@ export default function Home() {
   const [taskDeadline, setTaskDeadline] = useState(formatDate(new Date()));
 
   const [editOpen, setEditOpen] = useState(false);
-  const [editTask, setEditTask] = useState(null);
-  const [editDescription, setEditDesciption] = useState('');
+  const [currEditTask, setCurrEditTask] = useState(null);
+  const [editDescription, setEditDescription] = useState('');
   const [editDeadline, setEditDeadline] = useState(formatDate(new Date()))
+
   useEffect(()=>{
     if(status == 'loading')return;
     if(!session){
@@ -112,6 +113,37 @@ export default function Home() {
     window.location.reload();
   }
 
+  function handleEditOpen(pt){
+    setEditOpen(true);
+    setEditDeadline(pt.taskDeadline);
+    setEditDescription(pt.description);
+    setCurrEditTask(pt);
+  }
+
+  function handleEditClose(){
+    setEditOpen(false);
+    setEditDeadline(formatDate(new Date()));
+    setEditDescription('');
+    setCurrEditTask(null);
+  }
+
+   async function editTask(){
+     try {
+      await axios.put(`/api/task`,{
+        userId : session?.user.id,
+        taskId : currEditTask?._id,
+        newDescription : editDescription,
+        newDeadline : formatDate(new Date(editDeadline)) 
+      })
+    } catch (error) {
+      console.log(error);
+      alert('Task not added !!')
+    }
+    window.location.reload();
+  }
+
+
+
   return (
     <Suspense fallback={<Loading />}>
       <div className="mx-12 py-12">
@@ -128,7 +160,7 @@ export default function Home() {
               <div className="flex justify-center pr-6">
                 {pt.isCompleted==false && <div>{formatDate(new Date(pt.taskDeadline))}</div>}
                 <div onClick={()=>completeTask(pt)}><CheckCircleIcon color="success"/></div>
-                <div><EditIcon color="warning"/></div>
+                <div onClick={()=>handleEditOpen(pt)}><EditIcon color="warning"/></div>
                 <div onClick={()=>deletePendingTask(pt)}><DeleteIcon color="error"/></div>
               </div>
               </div>)
@@ -196,6 +228,72 @@ export default function Home() {
 
                         <div className="flex justify-center text-black font-heading">
                           <div className="border-2 border-primary-500 rounded-lg px-3 py-2 my-4  transition-all duration-300 ease-in-out hover:scale-110 hover:border-primary-400 hover:shadow-lg cursor-pointer" onClick={addTask}>Add Task</div>
+                        </div>
+                </div>
+            </div>
+            </div>
+      </Modal>
+
+
+      <Modal open={editOpen} onClose={handleEditClose}>
+            <div className="flex justify-center">
+            <div className="flex flex-col justify-center h-screen">
+                <div className="bg-secondary-300 rounded-lg text-background border-2 pt-6 pb-6 w-96">
+                    <div className="flex justify-end cursor-pointer px-2">
+                        <CloseIcon
+                        sx={{ color: 'red', cursor: 'pointer', fontSize: 30 }}
+                        color="font-bold text-xl mt-2"
+                        onClick={handleEditClose} />
+                    </div> 
+                    <div className="text-center text-xl">
+                      Edit task
+                    </div>
+           <div className="mt-6 mb-4 flex justify-center">
+            <TextField size="small" id="outlined-basic" label="Description" value={editDescription} onChange={(e)=>setEditDescription(e.target.value)}
+            type="text" variant="outlined" 
+            sx={{
+              "& .MuiOutlinedInput-root": {
+              color: "#000",
+              fontFamily: "Arial",
+
+              "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#000",
+              borderWidth: "1px",
+              borderRadius : "4px"
+              },
+            },
+              "& .MuiInputLabel-outlined": {
+              color: "#000", 
+              borderRadius : "4px"
+            },
+           }}  
+          className="border w-64 border-primary-500 rounded-lg" />
+          </div>
+
+           <div className="mt-6 mb-4 flex justify-center">
+            <TextField  size="small" id="outlined-basic" label="Deadline" value={editDeadline} onChange={(e)=>setEditDeadline(e.target.value)}
+            type="date" variant="outlined" 
+            sx={{
+              "& .MuiOutlinedInput-root": {
+              color: "#000",
+              fontFamily: "Arial",
+
+              "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#000",
+              borderWidth: "1px",
+              borderRadius : "4px"
+              },
+            },
+              "& .MuiInputLabel-outlined": {
+              color: "#000", 
+              borderRadius : "4px"
+            },
+           }}  
+          className="border border-primary-500 w-64 rounded-lg" />
+          </div>
+
+                        <div className="flex justify-center text-black font-heading">
+                          <div className="border-2 border-primary-500 rounded-lg px-3 py-2 my-4  transition-all duration-300 ease-in-out hover:scale-110 hover:border-primary-400 hover:shadow-lg cursor-pointer" onClick={editTask}>Edit Task</div>
                         </div>
                 </div>
             </div>
