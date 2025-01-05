@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import Loading from "@/app/loading";
+import Loading from "./loading";
 import { TextField } from "@mui/material";
 import Link from "next/link";
 import axios from "axios";
