@@ -11,11 +11,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Modal, TextField } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 export default function Home() {
 
   const {data : session, status} = useSession();
   const router = useRouter();
+  const [hideCompletedTasks, setHideCompletedTasks] = useState(true);
   const [pendingTasks, setPendingTasks] = useState<taskInterface[]>([]);
   const [completedTasks, setCompletedTasks] = useState<taskInterface[]>([]);
 
@@ -45,29 +48,14 @@ export default function Home() {
     }
   },[session, status, router])
   
-  async function deleteCompletedTask(pt){
-    try {
-      await axios.delete(`/api/task`, {
-        userId : (session?.user.id).toString(),
-        taskId : (pt._id).toString()
-      })
-      alert('Task deleted successfully !!')
-    } catch (error) {
-     console.log(error);
-      alert('Task not deleted!!');
-      return;
-    }
-    const newCompletedTasks = completedTasks.filter((task)=>{
-      return task._id != pt._id;
-    })
-    setPendingTasks(newCompletedTasks);
-  }
 
   async function deletePendingTask(pt){
     try {
       await axios.delete(`/api/task`, {
-        userId : (session?.user.id).toString(),
-        taskId : (pt._id).toString()
+      data : {
+        userId : session?.user.id,
+        taskId : pt._id
+      }
       })
       alert('Task deleted successfully !!')
     } catch (error) {
@@ -75,10 +63,7 @@ export default function Home() {
       alert('Task not deleted!!');
       return;
     }
-    const newPendingTasks = pendingTasks.filter((task)=>{
-      return task._id != pt._id;
-    })
-    setPendingTasks(newPendingTasks);
+      window.location.reload();
   }
 
   function handleOnClose(){
@@ -97,6 +82,7 @@ export default function Home() {
     } catch (error) {
       console.log(error);
     }
+    window.location.reload();
   }
 
   async function addTask(){
@@ -149,23 +135,53 @@ export default function Home() {
       <div className="mx-12 py-12">
         <div>
           <div className="flex justify-between pb-6">
-            <div className="text-2xl font-bold">Pending tasks</div>
-            <div onClick={()=>setAddOpen(true)} href={'/signin'} className="px-2 py-1.5 ml-2 text-md border-2 transition-all duration-300 ease-in-out hover:scale-110 hover:border-green-400 hover:shadow-lg border-green-500 cursor-pointer rounded-md text-green-800">Add task</div>
+            <div className="text-2xl font-bold">Pending tasks {pendingTasks.length!=0 && <span>( {pendingTasks.length} )</span>}</div>
+            <div onClick={()=>setAddOpen(true)} className="px-2 py-1.5 ml-2 text-md border-2 transition-all duration-300 ease-in-out hover:scale-110 hover:border-green-400 hover:shadow-lg border-green-500 cursor-pointer rounded-md text-green-800">Add task</div>
           </div>
           {pendingTasks.length == 0 ?  
-            <div className="text-center">No pending tasks</div> : 
+            <div className="text-center font-semibold text-xl">No pending tasks</div> : 
             pendingTasks.map((pt, ind)=>{
-              return (<div key={ind} className={`border ${(pt.isCompleted==true) ? ' border-green-600 ' : ' border-red-600 '} flex justify-between px-4`}>
-              <div>{pt.description}</div>
+              return (<div key={ind} className={` mx-12 mb-8 border-2 py-6 rounded-lg border-red-600 flex justify-between px-4 transition-all duration-300 ease-in-out hover:border-red-400 hover:shadow-lg `}>
+              <div className="text-xl font-semibold">{pt.description}</div>
               <div className="flex justify-center pr-6">
-                {pt.isCompleted==false && <div>{formatDate(new Date(pt.taskDeadline))}</div>}
-                <div onClick={()=>completeTask(pt)}><CheckCircleIcon color="success"/></div>
-                <div onClick={()=>handleEditOpen(pt)}><EditIcon color="warning"/></div>
-                <div onClick={()=>deletePendingTask(pt)}><DeleteIcon color="error"/></div>
+                {pt.isCompleted==false && <div className="flex flex-col justify-center mr-4">{formatDate(new Date(pt.taskDeadline))}</div>}
+                <div className="flex flex-col justify-center cursor-pointer mr-4" onClick={()=>completeTask(pt)}><CheckCircleIcon fontSize="medium" color="success"/></div>
+                <div className="flex flex-col justify-center cursor-pointer mr-4"  onClick={()=>handleEditOpen(pt)}><EditIcon color="warning"/></div>
+                <div className="flex flex-col justify-center cursor-pointer" onClick={()=>deletePendingTask(pt)}><DeleteIcon color="error"/></div>
               </div>
               </div>)
             })
           }
+
+        </div>
+
+        <div>
+          <div className="flex justify-between pt-12 pb-6">
+            <div className="text-2xl font-bold ">Completed tasks {completedTasks.length!=0 && <span>( {completedTasks.length} )</span>}</div>
+            <div onClick={()=>setHideCompletedTasks(!hideCompletedTasks)} className=" flex px-2 py-1.5 ml-2 text-md border-2 transition-all duration-300 ease-in-out hover:scale-110 hover:border-gray-600 hover:shadow-lg border-gray-800 cursor-pointer rounded-md">
+              {
+                hideCompletedTasks ? 
+                <div><KeyboardArrowDownIcon fontSize="medium" /></div> :
+                <div><KeyboardArrowUpIcon fontSize="medium" /></div> 
+              }
+            </div>
+          </div>
+        {!hideCompletedTasks && <div>
+          {(completedTasks.length == 0) ?  
+            <div className="text-center font-semibold text-xl">No completed tasks</div> : 
+            completedTasks.map((pt, ind)=>{
+              return (<div key={ind} className={` mx-12 mb-8 border-2 py-6 rounded-lg border-green-600 flex justify-between px-4 transition-all duration-300 ease-in-out hover:border-green-400 hover:shadow-lg `}>
+              <div className="text-xl font-semibold">{pt.description}</div>
+              <div className="flex justify-center pr-6">
+                <div className="flex flex-col justify-center mr-4">{formatDate(new Date(pt.taskDeadline))}</div>
+                <div className="flex flex-col justify-center cursor-pointer" onClick={()=>deletePendingTask(pt)}><DeleteIcon color="error"/></div>
+              </div>
+              </div>)
+            })
+          }
+          </div>
+        }
+
 
         </div>
       </div>
