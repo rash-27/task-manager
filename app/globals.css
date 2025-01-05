@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --background: #111827;
+    --foreground: #020202;
+  
+    --primary-50: #f8f5fc;
+    --primary-100: #f0eafb;
+    --primary-200: #d3bff3;
+    --primary-300: #b08ee6;
+    --primary-400: #976ae2;
+    --primary-500: #6025c0;
+    --primary-600: #4d1e9a;
+    --primary-700: #380d80;
+    --primary-800: #35156b;
+    --primary-900: #1f0d40;
+  
+    --secondary-50: #f9fafb;
+    --secondary-100: #f3f4f6;
+    --secondary-200: #e5e7eb;
+    --secondary-300: #d1d5db;
+    --secondary-400: #9ca3af;
+    --secondary-500: #6b7280;
+    --secondary-600: #4b5563;
+    --secondary-700: #374151;
+    --secondary-800: #1f2937;
+    --secondary-900: #111827;
+    --secondary-950: #030712;
+  }
+
+body {
+  background: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
