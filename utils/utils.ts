@@ -6,6 +6,21 @@ export interface taskInterface {
   description : string,
   taskDeadline : Date
 }
+ 
+export interface tokenInterface {
+    id?: string;
+    email?: string;
+    name?: string
+}
+
+export interface sessionInterface {
+  user : {
+    id?: string;
+    email?: string;
+    name?: string
+  }
+}
+
 
 export function findTotalTasks(userTasks : [taskInterface]){
    return userTasks.length;

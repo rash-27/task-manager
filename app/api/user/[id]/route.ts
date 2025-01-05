@@ -3,7 +3,7 @@ import { connectToDB } from '@/utils/database';
 import User from '@/models/user';
 
 // Update password and name of user
-export const PUT = async (req, {params}) => {
+export const PUT = async (req : Request, {params}) => {
     const { oldPassword, newPassword, name } = await req.json();
     
     try {
@@ -25,14 +25,14 @@ export const PUT = async (req, {params}) => {
         }
         await user.save();
         return new Response('User details updated', { status: 200 });
-    } catch (error) {
+    } catch (error : unknown) {
         console.log(error);
         return new Response('Internal server error', { status: 500 });
     }
 }
 
 // Get the user data
-export const GET = async (req, {params}) => {
+export const GET = async (req : Request, {params}) => {
     try {
         await connectToDB();
         const param = await params;
@@ -41,7 +41,7 @@ export const GET = async (req, {params}) => {
             return new Response('User not found', { status: 404 });
         }
         return new Response(JSON.stringify({name : user.name, email : user.email}), { status: 200 });
-    } catch (error) {
+    } catch (error : unknown) {
         console.log(error);
         return new Response('Internal server error', { status: 500 });
     }

@@ -4,7 +4,9 @@ import bcrypt from 'bcryptjs';
 
 import User from '@/models/user';
 import { connectToDB } from '@/utils/database';
+import { sessionInterface, tokenInterface } from '../../../../utils/utils';
 
+//@ts-expect-error unknown error
 const handler = NextAuth({
   providers: [
     Credentials({
@@ -17,18 +19,18 @@ const handler = NextAuth({
       async authorize(credentials) {
         try {
           await connectToDB();
-          const user = await User.findOne({ email : credentials.email });
+          const user = await User.findOne({ email : credentials?.email });
           if (!user) {
             throw new Error('Invalid email or password');
           }
-          const isValid = await bcrypt.compare(credentials.password, user.password);
+          const isValid = bcrypt.compare(credentials?.password || " ", user?.password);
           if (!isValid) {
             throw new Error('Invalid email or password');
           }
           return { email: user.email, id : user.id, name : user.name };
         }
-        catch (error) {
-          console.log("Error authorizing credentials: ", error.message);
+        catch (error : unknown) {
+          console.log("Error authorizing credentials: ", error);
           throw new Error('Invalid email or password');
         }
       }
@@ -37,16 +39,15 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   url: process.env.NEXTAUTH_URL,
   callbacks: {
-    async jwt({token, user}){
+    async jwt({token, user} : {token : tokenInterface, user : any}){
       if(user){
-        console.log(user);
         token.name = user.name;
         token.email = user.email;
         token.id = user.id.toString();
       }
       return token;
     },
-    async session({session, token}) {
+    async session({session, token} : {session : sessionInterface, token : tokenInterface}) {
 
         if (token && session.user) {
           session.user.name = token.name;
@@ -57,7 +58,7 @@ const handler = NextAuth({
       return session;
     },
 
-    async signIn({ account, profile, user, credentials }) {
+    async signIn({ account, credentials } : {account : {provider : string}, credentials : any}) {
       try {
         await connectToDB();
 
@@ -73,8 +74,8 @@ const handler = NextAuth({
           return true;
         }else return false;
 
-      } catch (error) {
-        console.log("Error checking if user exists: ", error.message);
+      } catch (error: unknown) {
+        console.log("Error checking if user exists: ", error);
         return false
       }
     },

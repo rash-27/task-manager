@@ -3,7 +3,7 @@ import Task from '@/models/task';
 import User from '@/models/user';
 
 // get all tasks of a user
-export const GET = async (req, {params}) => {
+export const GET = async (request : Request, {params}) => {
     try {
         await connectToDB();
         const param = await params;

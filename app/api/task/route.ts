@@ -3,7 +3,7 @@ import Task from '@/models/task';
 import User from '@/models/user';
 
 // Create a task
-export const POST = async (request : any) => {
+export const POST = async (request : Request) => {
     const { userId, description, taskDeadline } = await request.json();
     try {
         await connectToDB();
@@ -22,7 +22,7 @@ export const POST = async (request : any) => {
 
 
  // update task of a user 
-export const PUT = async (request : any) => {
+export const PUT = async (request : Request) => {
     const { userId, taskId, newDescription, newDeadline, isCompleted } = await request.json();
     try {
         await connectToDB();
@@ -49,7 +49,7 @@ export const PUT = async (request : any) => {
 }
 
 // Delete task of a user 
-export const DELETE = async (request : any) => {
+export const DELETE = async (request : Request) => {
     const { userId, taskId } = await request.json();
     try {
         await connectToDB();

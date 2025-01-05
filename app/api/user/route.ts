@@ -2,7 +2,7 @@ import { connectToDB } from '@/utils/database';
 import User from '@/models/user';
 import bcrypt from 'bcryptjs';
 // Create a user
-export const POST = async (request : any) => {
+export const POST = async (request : Request) => {
     const { email, password, name } = await request.json();
     try {
         await connectToDB();
