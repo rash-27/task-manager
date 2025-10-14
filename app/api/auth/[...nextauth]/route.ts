@@ -1,10 +1,10 @@
-import NextAuth from 'next-auth';
+import NextAuth, { Session } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 
 import User from '@/models/user';
 import { connectToDB } from '@/utils/database';
-import { sessionInterface, tokenInterface } from '../../../../utils/utils';
+import { JWT } from 'next-auth/jwt';
 
 //@ts-expect-error unknown error
 const handler = NextAuth({
@@ -39,7 +39,7 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   url: process.env.NEXTAUTH_URL,
   callbacks: {
-    async jwt({token, user} : {token : tokenInterface, user : any}){
+    async jwt({token, user} : {token : JWT, user : any}){
       if(user){
         token.name = user.name;
         token.email = user.email;
@@ -47,7 +47,7 @@ const handler = NextAuth({
       }
       return token;
     },
-    async session({session, token} : {session : sessionInterface, token : tokenInterface}) {
+    async session({session, token} : {session : Session, token : JWT}) {
 
         if (token && session.user) {
           session.user.name = token.name;
@@ -57,7 +57,7 @@ const handler = NextAuth({
 
       return session;
     },
-
+    //@ts-ignore
     async signIn({ account, credentials } : {account : {provider : string}, credentials : any}) {
       try {
         await connectToDB();

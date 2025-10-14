@@ -22,12 +22,13 @@ export default function Signup() {
 
   async function handleOnClick(){
     try {
-      await axios.post('/api/user',{
+      const response = await axios.post('/api/user',{
         email : email,
         name : name,
         password : password,
         
       })
+      console.log(response.status)
       alert('Successfully registered! now you can login!')
     } catch (error) {
       console.log(error)

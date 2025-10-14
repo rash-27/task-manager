@@ -35,7 +35,7 @@ export default function Home() {
   useEffect(()=>{
     if(status == 'loading')return;
     if(!session){
-      router.push('/signin');
+      return router.push('/signin');
     }else {
       axios.get(`/api/task/${session.user?.id}`)
       .then((res)=>{
@@ -129,7 +129,7 @@ export default function Home() {
     window.location.reload();
   }
 
-
+if(status == 'loading')return <Loading />;
 
   return (
     <Suspense fallback={<Loading />}>
